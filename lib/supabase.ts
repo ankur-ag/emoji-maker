@@ -11,7 +11,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function createOrGetUser(userId: string) {
   // First, try to get the user
-  let { data: user, error } = await supabase
+  const { data: user, error } = await supabase
     .from('users')
     .select('*')
     .eq('id', userId)

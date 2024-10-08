@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getAuth } from '@clerk/nextjs/server';
+import { Emoji } from '@/types';
 
 export async function GET(request: NextRequest) {
   const { userId } = getAuth(request);
@@ -24,9 +25,9 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error;
 
-    const emojisWithLikedStatus = data.map((emoji: any) => ({
+    const emojisWithLikedStatus = data.map((emoji: Emoji) => ({
       ...emoji,
-      liked_by_user: emoji.liked_by_user ? emoji.liked_by_user.some((like: any) => like.user_id === userId) : false
+      liked_by_user: emoji.liked_by_user ? true : false
     }));
 
     return NextResponse.json({ emojis: emojisWithLikedStatus });
