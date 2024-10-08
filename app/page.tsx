@@ -12,28 +12,6 @@ export default function Home() {
     setRefreshTrigger(prev => prev + 1);
   };
 
-  const handleLikeToggle = async (id: string, isLiked: boolean): Promise<number> => {
-    try {
-      const response = await fetch('/api/like-emoji', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ emojiId: id, isLiked }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update like');
-      }
-
-      const data = await response.json();
-      return data.likes_count;
-    } catch (error) {
-      console.error('Error updating like:', error);
-      throw error;
-    }
-  };
-
   return (
     <div className="min-h-screen p-8 pb-20 flex flex-col items-center gap-8">
       <main className="w-full max-w-4xl flex flex-col items-center gap-8">
@@ -42,7 +20,7 @@ export default function Home() {
             <h2 className="text-2xl font-bold mb-4">Welcome to Emoji Maker</h2>
           </div>
           <EmojiGenerator onNewEmoji={handleNewEmoji} />
-          <EmojiGrid onLike={handleLikeToggle} refreshTrigger={refreshTrigger} />
+          <EmojiGrid refreshTrigger={refreshTrigger} />
         </SignedIn>
         <SignedOut>
           <SignIn />
