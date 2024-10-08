@@ -41,7 +41,7 @@ export async function createOrGetUser(userId: string) {
       throw insertError;
     }
 
-    user = newUser;
+    return newUser;
   }
 
   return user;
