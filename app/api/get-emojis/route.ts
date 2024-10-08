@@ -16,12 +16,20 @@ export async function GET() {
   try {
     const { data, error } = await supabase
       .from('emojis')
-      .select('*')
+      .select(`
+        *,
+        liked_by_user:emoji_likes(user_id)
+      `)
       .order('inserted_at', { ascending: false });
 
     if (error) throw error;
 
-    return NextResponse.json({ emojis: data });
+    const emojisWithLikedStatus = data.map((emoji: any) => ({
+      ...emoji,
+      liked_by_user: emoji.liked_by_user ? emoji.liked_by_user.some((like: any) => like.user_id === userId) : false
+    }));
+
+    return NextResponse.json({ emojis: emojisWithLikedStatus });
   } catch (error) {
     console.error('Error fetching emojis:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

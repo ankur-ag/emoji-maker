@@ -9,23 +9,38 @@ export default function Home() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleNewEmoji = () => {
-    // Increment the refreshTrigger to cause a re-fetch in EmojiGrid
     setRefreshTrigger(prev => prev + 1);
   };
 
-  const handleLike = async (id: string, isLiked: boolean) => {
-    // Implement like functionality (we'll do this in the next step)
+  const handleLikeToggle = async (id: string, isLiked: boolean): Promise<number> => {
+    try {
+      const response = await fetch('/api/like-emoji', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ emojiId: id, isLiked }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update like');
+      }
+
+      const data = await response.json();
+      return data.likes_count;
+    } catch (error) {
+      console.error('Error updating like:', error);
+      throw error;
+    }
   };
 
   return (
-    <div className="min-h-screen p-8 pb-20 flex flex-col items-center gap-8">
-      <main className="w-full max-w-4xl flex flex-col items-center gap-8">
+    <div className="flex flex-col items-center min-h-screen py-8">
+      <main className="w-full max-w-4xl px-4">
         <SignedIn>
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">Welcome to Emoji Maker</h2>
-          </div>
+          <h1 className="text-4xl font-bold text-center mb-8">Emoji Maker</h1>
           <EmojiGenerator onNewEmoji={handleNewEmoji} />
-          <EmojiGrid onLike={handleLike} refreshTrigger={refreshTrigger} />
+          <EmojiGrid onLike={handleLikeToggle} refreshTrigger={refreshTrigger} />
         </SignedIn>
         <SignedOut>
           <SignIn />

@@ -24,6 +24,12 @@
     stripe_customer_id TEXT,
     stripe_subscription_id TEXT
 );
+- TABLE emoji_likes (
+    user_id TEXT NOT NULL,
+    emoji_id INT8 NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT (timezone('utc'::text, now())) NOT NULL,
+    PRIMARY KEY (user_id, emoji_id),
+);
 
 # Requirements
 1. Create users
@@ -36,9 +42,19 @@
 3. Display emojis in the grid
     1. Emoji grid should fetch and display all the emojis in the emojis table
     2. Each time a new emoji is generated, the emoji grid should refresh to show the new emoji
-4. Likes interaction
+4. Integrate Likes interaction with users table
     1. When the user clicks the like button, increment the likes_count of the emoji by 1
     2. When the user clicks the unlike button, decrement the likes_count of the emoji by 1
+5. Each User can only like an emoji once
+    1. When the user clicks the like button:
+        a. Check if a row exists in the emoji_likes table for the current user and emoji
+        b. If it doesn't exist, create a new row in the emoji_likes table
+        c. Increment the likes_count of the emoji by 1
+    2. When the user clicks the like button to unlike an emoji:
+        a. Check if a row exists in the emoji_likes table for the current user and emoji
+        b. If it exists, delete the row from the emoji_likes table
+        c. Decrement the likes_count of the emoji by 1
+    3. When fetching emojis for display, include a boolean field 'liked_by_user' that indicates whether the current user has liked each emoji
 
 # Documentation
 ## Example of uploading files to Supabase storage

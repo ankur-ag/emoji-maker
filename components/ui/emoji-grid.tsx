@@ -2,16 +2,18 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Card } from './card';
 import { Heart, Download } from 'lucide-react';
+import { LikeHearts } from './like-hearts'; // We'll create this component next
 
 interface Emoji {
   id: string;
   image_url: string;
   prompt: string;
   likes_count: number;
+  liked_by_user: boolean;
 }
 
 interface EmojiGridProps {
-  onLike: (id: string, isLiked: boolean) => void;
+  onLike: (id: string, isLiked: boolean) => Promise<number>;
   refreshTrigger: number;
 }
 
@@ -51,6 +53,42 @@ export function EmojiGrid({ onLike, refreshTrigger }: EmojiGridProps) {
       .catch(() => console.error('Error downloading emoji'));
   };
 
+  const handleLikeToggle = async (id: string) => {
+    const emoji = emojis.find(e => e.id === id);
+    if (!emoji) return;
+
+    const newIsLiked = !emoji.liked_by_user;
+    const optimisticLikesCount = newIsLiked ? emoji.likes_count + 1 : Math.max(emoji.likes_count - 1, 0);
+
+    // Immediately update UI
+    setEmojis(prevEmojis => 
+      prevEmojis.map(e => 
+        e.id === id ? { ...e, liked_by_user: newIsLiked, likes_count: optimisticLikesCount } : e
+      )
+    );
+
+    try {
+      // Make API call in the background
+      const newLikesCount = await onLike(id, newIsLiked);
+      
+      // Update with the actual count from the server
+      setEmojis(prevEmojis => 
+        prevEmojis.map(e => 
+          e.id === id ? { ...e, likes_count: newLikesCount } : e
+        )
+      );
+    } catch (error) {
+      console.error('Error updating like:', error);
+      // Revert the optimistic update in case of error
+      setEmojis(prevEmojis => 
+        prevEmojis.map(e => 
+          e.id === id ? { ...e, liked_by_user: !newIsLiked, likes_count: emoji.likes_count } : e
+        )
+      );
+      // Optionally, show an error message to the user
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {emojis.map((emoji) => (
@@ -59,11 +97,11 @@ export function EmojiGrid({ onLike, refreshTrigger }: EmojiGridProps) {
           <p className="mt-2 text-center">{emoji.prompt}</p>
           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
             <button 
-              onClick={() => onLike(emoji.id, true)} 
-              className="text-white p-2 hover:text-red-500 transition-colors"
-              aria-label="Like"
+              onClick={() => handleLikeToggle(emoji.id)} 
+              className={`p-2 transition-colors ${emoji.liked_by_user ? 'text-red-500' : 'text-white hover:text-red-500'}`}
+              aria-label={emoji.liked_by_user ? "Unlike" : "Like"}
             >
-              <Heart />
+              <Heart fill={emoji.liked_by_user ? "currentColor" : "none"} />
             </button>
             <button 
               onClick={() => handleDownload(emoji.image_url, emoji.prompt)} 
@@ -73,7 +111,7 @@ export function EmojiGrid({ onLike, refreshTrigger }: EmojiGridProps) {
               <Download />
             </button>
           </div>
-          <span className="mt-2 text-sm text-gray-500">{emoji.likes_count} likes</span>
+          <LikeHearts count={emoji.likes_count} />
         </Card>
       ))}
     </div>
