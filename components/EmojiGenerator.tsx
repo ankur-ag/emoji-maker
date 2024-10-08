@@ -5,13 +5,13 @@ import Image from 'next/image';
 
 interface Emoji {
   id: string;
-  url: string;
+  image_url: string;
   prompt: string;
-  likes: number;
+  likes_count: number;
 }
 
 interface EmojiGeneratorProps {
-  onNewEmoji: (emoji: Emoji) => void;
+  onNewEmoji: () => void;
 }
 
 export function EmojiGenerator({ onNewEmoji }: EmojiGeneratorProps) {
@@ -35,14 +35,8 @@ export function EmojiGenerator({ onNewEmoji }: EmojiGeneratorProps) {
       }
 
       const data = await response.json();
-      const newEmoji: Emoji = {
-        id: data.emoji.id,
-        url: data.emoji.image_url,
-        prompt: data.emoji.prompt,
-        likes: 0,
-      };
-      setLatestEmoji(newEmoji);
-      onNewEmoji(newEmoji);
+      setLatestEmoji(data.emoji);
+      onNewEmoji(); // Call this function to trigger a refresh of the EmojiGrid
     } catch (error) {
       console.error('Error generating emoji:', error);
       // You might want to show an error message to the user here
@@ -62,7 +56,7 @@ export function EmojiGenerator({ onNewEmoji }: EmojiGeneratorProps) {
       ) : latestEmoji ? (
         <Card className="p-4 flex flex-col items-center">
           <h2 className="text-xl font-semibold mb-2">Latest Generated Emoji</h2>
-          <Image src={latestEmoji.url} alt={latestEmoji.prompt} width={200} height={200} className="w-auto h-auto" />
+          <Image src={latestEmoji.image_url} alt={latestEmoji.prompt} width={200} height={200} className="w-auto h-auto" />
           <p className="mt-2 text-center">{latestEmoji.prompt}</p>
         </Card>
       ) : null}

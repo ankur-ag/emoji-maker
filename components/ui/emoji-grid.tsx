@@ -1,78 +1,79 @@
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Button } from './button';
 import { Card } from './card';
-import { Download, Heart } from 'lucide-react';
-import { useState } from 'react';
+import { Heart, Download } from 'lucide-react';
 
-type Emoji = {
+interface Emoji {
   id: string;
-  url: string;
+  image_url: string;
   prompt: string;
-  likes: number;
-};
+  likes_count: number;
+}
 
-type EmojiGridProps = {
-  emojis: Emoji[];
+interface EmojiGridProps {
   onLike: (id: string, isLiked: boolean) => void;
-};
+  refreshTrigger: number;
+}
 
-export function EmojiGrid({ emojis, onLike }: EmojiGridProps) {
-  const [likedEmojis, setLikedEmojis] = useState<Set<string>>(new Set());
+export function EmojiGrid({ onLike, refreshTrigger }: EmojiGridProps) {
+  const [emojis, setEmojis] = useState<Emoji[]>([]);
 
-  const handleDownload = async (url: string, prompt: string) => {
+  const fetchEmojis = async () => {
     try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = `emoji-${prompt.replace(/\s+/g, '-')}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
+      const response = await fetch('/api/get-emojis');
+      if (!response.ok) {
+        throw new Error('Failed to fetch emojis');
+      }
+      const data = await response.json();
+      setEmojis(data.emojis);
     } catch (error) {
-      console.error('Error downloading emoji:', error);
+      console.error('Error fetching emojis:', error);
     }
   };
 
-  const handleLike = (id: string) => {
-    setLikedEmojis((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
-    onLike(id, !likedEmojis.has(id));
+  useEffect(() => {
+    fetchEmojis();
+  }, [refreshTrigger]);
+
+  const handleDownload = (imageUrl: string, prompt: string) => {
+    fetch(imageUrl)
+      .then(response => response.blob())
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `emoji-${prompt}.png`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(() => console.error('Error downloading emoji'));
   };
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {emojis.map((emoji) => (
-        <Card key={emoji.id} className="relative group">
-          <Image src={emoji.url} alt={emoji.prompt} width={100} height={100} className="w-full h-auto" />
+        <Card key={emoji.id} className="p-4 flex flex-col items-center relative group">
+          <Image src={emoji.image_url} alt={emoji.prompt} width={100} height={100} className="w-auto h-auto" />
+          <p className="mt-2 text-center">{emoji.prompt}</p>
           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="mr-2 text-white hover:text-blue-400"
-              onClick={() => handleDownload(emoji.url, emoji.prompt)}
+            <button 
+              onClick={() => onLike(emoji.id, true)} 
+              className="text-white p-2 hover:text-red-500 transition-colors"
+              aria-label="Like"
             >
-              <Download className="h-6 w-6" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className={`text-white ${likedEmojis.has(emoji.id) ? 'text-red-400' : 'hover:text-red-400'}`}
-              onClick={() => handleLike(emoji.id)}
+              <Heart />
+            </button>
+            <button 
+              onClick={() => handleDownload(emoji.image_url, emoji.prompt)} 
+              className="text-white p-2 hover:text-blue-500 transition-colors"
+              aria-label="Download"
             >
-              <Heart className={`h-6 w-6 ${likedEmojis.has(emoji.id) ? 'fill-current' : ''}`} />
-              <span className="ml-1">{emoji.likes}</span>
-            </Button>
+              <Download />
+            </button>
           </div>
+          <span className="mt-2 text-sm text-gray-500">{emoji.likes_count} likes</span>
         </Card>
       ))}
     </div>

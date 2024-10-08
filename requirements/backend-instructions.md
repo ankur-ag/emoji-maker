@@ -34,9 +34,9 @@
     1. Upload an emoji file returned by the Replicate model to the emojis bucket when the user generates an emoji
     2. Create a row in the emojis table with the emoji file as the image_url, prompt entered by the user, user_id of the current user, and the current timestamp
 3. Display emojis in the grid
-    1. Emoji grid should display all the emojis in the emojis table
+    1. Emoji grid should fetch and display all the emojis in the emojis table
     2. Each time a new emoji is generated, the emoji grid should refresh to show the new emoji
-3. Likes interaction
+4. Likes interaction
     1. When the user clicks the like button, increment the likes_count of the emoji by 1
     2. When the user clicks the unlike button, decrement the likes_count of the emoji by 1
 

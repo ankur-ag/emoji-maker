@@ -5,26 +5,16 @@ import { EmojiGrid } from '@/components/ui/emoji-grid';
 import { SignedIn, SignedOut, SignIn } from "@clerk/nextjs";
 import { EmojiGenerator } from '@/components/EmojiGenerator';
 
-interface Emoji {
-  id: string;
-  url: string;
-  prompt: string;
-  likes: number;
-}
-
 export default function Home() {
-  const [emojis, setEmojis] = useState<Emoji[]>([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const handleNewEmoji = (newEmoji: Emoji) => {
-    setEmojis((prevEmojis) => [newEmoji, ...prevEmojis]);
+  const handleNewEmoji = () => {
+    // Increment the refreshTrigger to cause a re-fetch in EmojiGrid
+    setRefreshTrigger(prev => prev + 1);
   };
 
-  const handleLike = (id: string, isLiked: boolean) => {
-    setEmojis((prevEmojis) =>
-      prevEmojis.map((emoji) =>
-        emoji.id === id ? { ...emoji, likes: emoji.likes + (isLiked ? 1 : -1) } : emoji
-      )
-    );
+  const handleLike = async (id: string, isLiked: boolean) => {
+    // Implement like functionality (we'll do this in the next step)
   };
 
   return (
@@ -35,7 +25,7 @@ export default function Home() {
             <h2 className="text-2xl font-bold mb-4">Welcome to Emoji Maker</h2>
           </div>
           <EmojiGenerator onNewEmoji={handleNewEmoji} />
-          <EmojiGrid emojis={emojis} onLike={handleLike} />
+          <EmojiGrid onLike={handleLike} refreshTrigger={refreshTrigger} />
         </SignedIn>
         <SignedOut>
           <SignIn />
