@@ -34,7 +34,11 @@ export default function RootLayout({
         >
           <UserInitializer />
           <Header />
-          {children}
+          <div className="flex justify-center w-full">
+            <main className="w-full max-w-4xl px-4">
+              {children}
+            </main>
+          </div>
         </body>
       </html>
     </ClerkProvider>

@@ -35,10 +35,12 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen py-8">
-      <main className="w-full max-w-4xl px-4">
+    <div className="min-h-screen p-8 pb-20 flex flex-col items-center gap-8">
+      <main className="w-full max-w-4xl flex flex-col items-center gap-8">
         <SignedIn>
-          <h1 className="text-4xl font-bold text-center mb-8">Emoji Maker</h1>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-4">Welcome to Emoji Maker</h2>
+          </div>
           <EmojiGenerator onNewEmoji={handleNewEmoji} />
           <EmojiGrid onLike={handleLikeToggle} refreshTrigger={refreshTrigger} />
         </SignedIn>
