@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     console.log("data: is here " + data);
     const emojisWithLikedStatus = data.map((emoji: Emoji) => ({
       ...emoji,
-      liked_by_user: Array.isArray(emoji.liked_by_user) && emoji.liked_by_user.length > 0 ? true : false
+      liked_by_user: Array.isArray(emoji.liked_by_user) && emoji.liked_by_user.length > 0
     }));
     return NextResponse.json({ emojis: emojisWithLikedStatus });
   } catch (error) {
