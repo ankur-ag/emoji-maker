@@ -24,12 +24,11 @@ export async function GET(request: NextRequest) {
       .order('inserted_at', { ascending: false });
 
     if (error) throw error;
-
+    console.log("data: is here " + data);
     const emojisWithLikedStatus = data.map((emoji: Emoji) => ({
       ...emoji,
-      liked_by_user: emoji.liked_by_user ? true : false
+      liked_by_user: Array.isArray(emoji.liked_by_user) && emoji.liked_by_user.length > 0 ? true : false
     }));
-
     return NextResponse.json({ emojis: emojisWithLikedStatus });
   } catch (error) {
     console.error('Error fetching emojis:', error);
