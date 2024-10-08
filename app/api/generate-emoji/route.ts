@@ -30,12 +30,12 @@ export async function POST(request: Request) {
       "fofr/sdxl-emoji:dee76b5afde21b0f01ed7925f0665b7e879c50ee718c5f78a9d38e04d523cc5e",
       {
         input: {
-          prompt: prompt,
+          prompt: "Generate a TOK emoji for" + prompt,
         }
       }
     );
 
-    if (!output || typeof output[0] !== 'string') {
+    if (!output || !Array.isArray(output) || typeof output[0] !== 'string') {
       throw new Error('Failed to generate emoji');
     }
 
