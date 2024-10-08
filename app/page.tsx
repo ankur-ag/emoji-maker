@@ -29,19 +29,26 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ prompt, userId: user?.id }),
+        body: JSON.stringify({ prompt }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate emoji');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate emoji');
       }
 
       const data = await response.json();
-      const newEmoji = { id: Date.now().toString(), url: data.url, prompt, likes: 0 };
+      const newEmoji: Emoji = {
+        id: data.emoji.id,
+        url: data.emoji.image_url,
+        prompt: data.emoji.prompt,
+        likes: 0,
+      };
       setLatestEmoji(newEmoji);
       setEmojis((prevEmojis) => [newEmoji, ...prevEmojis]);
     } catch (error) {
       console.error('Error generating emoji:', error);
+      // You might want to show an error message to the user here
     } finally {
       setIsGenerating(false);
     }
