@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Card } from './card';
 import { Heart, Download } from 'lucide-react';
-import { LikeHearts } from './like-hearts'; // We'll create this component next
+import { LikeHearts } from './like-hearts';
 
 interface Emoji {
   id: string;
