@@ -21,14 +21,16 @@ export async function GET(request: NextRequest) {
         *,
         liked_by_user:emoji_likes(user_id)
       `)
+      .eq('liked_by_user.user_id', userId)
       .order('inserted_at', { ascending: false });
 
     if (error) throw error;
-    console.log("data: is here " + data);
+    console.log("data: is here " + data[0].liked_by_user);
     const emojisWithLikedStatus = data.map((emoji: Emoji) => ({
       ...emoji,
       liked_by_user: Array.isArray(emoji.liked_by_user) && emoji.liked_by_user.length > 0
     }));
+    console.log("emojisWithLikedStatus: is here " + emojisWithLikedStatus);
     return NextResponse.json({ emojis: emojisWithLikedStatus });
   } catch (error) {
     console.error('Error fetching emojis:', error);

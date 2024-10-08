@@ -14,7 +14,7 @@ export async function createOrGetUser(userId: string) {
   const { data: user, error } = await supabase
     .from('users')
     .select('*')
-    .eq('id', userId)
+    .eq('user_id', userId)
     .single();
 
   if (error && error.code !== 'PGRST116') {
@@ -28,7 +28,7 @@ export async function createOrGetUser(userId: string) {
       .from('users')
       .insert([
         {
-          id: userId,
+          user_id: userId,
           tier: 'free',
           credits: 3,
         },
