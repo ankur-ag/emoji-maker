@@ -9,9 +9,9 @@ export default clerkMiddleware((auth, req) => {
     return NextResponse.next();
   }
 
-  if (!userId && isProtectedRoute(req)) {
-    return redirectToSignIn({ returnBackUrl: "/" });
-  }
+  // if (!userId && isProtectedRoute(req)) {
+  //   return redirectToSignIn({ returnBackUrl: "/" });
+  // }
 });
 
 export const config = {
