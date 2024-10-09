@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, UserButton } from "@clerk/nextjs";
 
 export function Header() {
   return (

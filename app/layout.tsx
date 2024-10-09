@@ -4,7 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 import "./globals.css";
 import { Header } from "@/components/ui/header";
 import { UserInitializer } from "@/components/UserInitializer";
-import { SignedIn, SignedOut, SignIn, SignInButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
